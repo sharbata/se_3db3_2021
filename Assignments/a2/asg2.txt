@@ -1,0 +1,25 @@
+connect to se3db3;
+
+--q1
+select FirstName, LastName, DateOfBirth from Order where DateOfBirth <= (values current date -18 years) and Date = '7/22/2020';
+
+--q2
+select belong.ProductID, p.Name categoryName from ProductCategory p,(select ProductID, ProductCategoryID from BelongsTo where ProductID in (select distinct ProductID from OrderContains where OrderID in(select OrderID from Order where DateOfBirth <= (values current date -20 years) and DateOfBirth >= (values current date -35 years)))) belong where p.ProductCategoryID = belong.ProductCategoryID;
+
+--q3
+select p.FirstName, p.LastName, p.DateOfBirth, p.City, p.Country from Person p, (select FirstName, LastName, DateOfBirth from WriteReview group by (FirstName, LastName, DateOfBirth) having count(*) = (select max(count) from (select count(*) count from WriteReview group by (FirstName,LastName,DateOfBirth)))) people where p.FirstName = people.FirstName and p.LastName = people.LastName and p.DateOfBirth = people.DateOfBirth;
+
+--q4a
+select count(*) num from (select TrackingNumber, count(OrderID) count from HasShipment group by TrackingNumber) where count > 1;
+
+--q5
+select ProductID from BelongsTo group by ProductID having count(*) = 1;
+
+--q6a
+select ProductID, Name, Brand from Product where Brand in (select Brand from Product group by Brand having count (*) = 1);
+
+--q8a
+select ProductID, Name, Brand  from Product where ProductID not in (select distinct ProductID from OrderContains);
+
+--q8b
+ select b.ProductID from (select distinct ProductID from Promotion) a, (select ProductID from Product where ProductID not in (select distinct ProductID from OrderContains)) b where a.ProductID = b.ProductID; 
